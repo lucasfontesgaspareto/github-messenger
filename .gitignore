@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 # dependencies
 node_modules
 
@@ -10,7 +9,7 @@ npm-debug.log
 
 # Nuxt generate
 dist
-=======
+
 # Logs
 logs
 *.log
@@ -70,4 +69,3 @@ typings/
 # dotenv environment variables file
 .env
 
->>>>>>> 43358a28f71070c76b044bd974d12b8c04f9be5b
