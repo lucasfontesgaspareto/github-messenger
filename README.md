@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # github-messenger
 
 > GitHub Messenger
@@ -20,3 +21,7 @@ $ yarn run generate
 ```
 
 For detailed explanation on how things work, checkout [Nuxt.js docs](https://nuxtjs.org).
+=======
+# github-messenger-
+go chat!
+>>>>>>> 43358a28f71070c76b044bd974d12b8c04f9be5b
