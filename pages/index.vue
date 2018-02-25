@@ -1,22 +1,25 @@
 <template>
   <section class="main">
-    <list></list>
+    <UserList></UserList>
+    <!-- <ChatList></ChatList> -->
   </section>
 </template>
 
 <script>
-import List from '~/components/List.vue'
+import UserList from '~/components/UserList.vue'
+import ChatList from '~/components/ChatList.vue'
 
 export default {
   components: {
-    List
+    UserList,
+    ChatList
   }
 }
 </script>
 
 <style>
-.main
-{
-  min-height: 100vh;
+.main {
+  max-width: 1024px;
+  margin: 0 auto;
 }
 </style>
