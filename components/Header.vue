@@ -20,6 +20,7 @@ export default {
     return {
     }
   },
+
   computed: {
     search: {
       get: function() {
@@ -29,8 +30,9 @@ export default {
         return this.$store.commit('SET_SEARCH', value)
       }
     },
-    ...mapState(['user'])
+    ...mapState(['user', 'profile'])
   },
+
   methods: {
     login() {
       firebase.auth().signInWithPopup(new firebase.auth.GithubAuthProvider()).then(result => {
@@ -39,6 +41,9 @@ export default {
 
         let maxPage = Math.ceil(profile.following / 30)
         let url = profile.following_url.replace('{/other_user}','')
+
+        // make online
+        firebase.database().ref(`presence/${profile.id}`).set(false)
 
         if (result.additionalUserInfo.isNewUser) {
           const getFollowingUsers = (page) => {
@@ -51,13 +56,14 @@ export default {
               if (page < maxPage) {
                 getFollowingUsers((page + 1))
               } else {
+                
                 this.$store.commit('SET_USERS', profile.following_users)
                 this.$axios.defaults.headers.common['Authorization'] = `Bearer ${result.user.qa}`
 
                 // http://localhost:5000/github-messenger/us-central1/app
                 // https://us-central1-github-messenger.cloudfunctions.net/app/profile
                 this.$axios.post('http://localhost:5000/github-messenger/us-central1/app/profile', profile)
-                  .then(res => console.log(res))
+                  .then(res => console.log('profile', res))
                   .catch(error => console.log(error))
               }
             }).catch(error => {
@@ -71,7 +77,31 @@ export default {
       }).catch(error => console.log(error))
     },
     logout() {
-      firebase.auth().signOut()
+      firebase.database().ref(`presence/${this.profile.id}`).set(false).then(res => {
+        firebase.auth().signOut()
+      })
+    }
+  },
+
+  watch: {
+    profile: function (profile) {
+      window.id = profile.id
+
+      firebase.database().ref('.info/connected').on('value', snaphost =>{
+        if (firebase.auth().currentUser) {
+          if (snaphost.val()) {
+            firebase.database().ref(`presence/${profile.id}`).set(true)
+          } else {
+            firebase.database().ref(`presence/${profile.id}`).set(false)
+          }
+        }
+      })
+    }
+  },
+
+  beforeMount() {
+    window.onbeforeunload = function() {
+      firebase.database().ref(`presence/${window.id}`).set(false)
     }
   }
 }

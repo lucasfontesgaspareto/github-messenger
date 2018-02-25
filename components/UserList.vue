@@ -1,6 +1,6 @@
 <template>
   <div class="user-list container column">
-    <div v-for="user in users" :key="user.userName" :class="{ online: user.online }" class="user">
+    <div v-for="user in users" :key="user.login" :class="{ online: isOn(user.id) }" class="user">
       <img :alt="user.login" class="avatar" :src="user.avatar_url">
     </div>
   </div>
@@ -15,13 +15,19 @@
   export default {
     data() {
       return {
-        _users: []
+        online: {}
       }
     },
 
     computed: {
       ...mapState(['user', 'profile']),
-      ...mapGetters(['users'])
+      ...mapGetters(['users']),
+
+      isOn: function () {
+        return function (id) {
+          return this.online[id]
+        }
+      }
     },
 
     watch: {
@@ -41,10 +47,11 @@
           return false
         }
 
-        const getUsers = () => {
-          this.$store.commit('SET_USERS', profile.following_users)
-        }
-        getUsers()
+        firebase.database().ref('presence').on('value', snapshot => {
+          this.online = snapshot.val()
+        })
+
+        this.$store.commit('SET_USERS', profile.following_users)
       }
     }
   }
@@ -57,7 +64,11 @@
     flex-wrap: wrap;
   }
   .user {
+    order: 2;
     margin: 4px;
+  }
+  .online  {
+    order: 1;
   }
   .avatar {
     display: inline-block;
