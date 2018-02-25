@@ -1,17 +1,54 @@
 <template>
   <div class="user-list container column">
     <div v-for="user in users" :key="user.userName" :class="{ online: user.online }" class="user">
-      <img :alt="user.userName" class="avatar" :src="user.imgUrl">
+      <img :alt="user.login" class="avatar" :src="user.avatar_url">
     </div>
   </div>
 </template>
 
 <script>
-  import { mapGetters } from 'vuex'
+  import { mapGetters, mapState } from 'vuex'
+  import firebase from 'firebase/app'
+  import 'firebase/auth'
+  import 'firebase/database'
 
   export default {
+    data() {
+      return {
+        _users: []
+      }
+    },
+
     computed: {
+      ...mapState(['user', 'profile']),
       ...mapGetters(['users'])
+    },
+
+    watch: {
+      user: function (user) {
+        if (!Object.keys(user).length) {
+          this.$store.commit('SET_PROFILE', null)
+          return false
+        }
+
+        firebase.database().ref(`profiles/${user.uid}`).on('value', snapshot => {
+          this.$store.commit('SET_PROFILE', snapshot.val())
+        })
+      },
+      profile: function (profile) {
+        if (!Object.keys(profile).length) {
+          this.$store.commit('SET_USERS', null)
+          return false
+        }
+
+        const getUsers = () => {
+          this.$axios.get(profile.following_url.replace('{/other_user}','')).then(res => {
+            this.$store.commit('SET_USERS', res.data)
+          }).catch(error => {
+          })
+        }
+        getUsers()
+      }
     }
   }
 </script>

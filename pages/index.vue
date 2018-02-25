@@ -9,7 +9,16 @@
 import UserList from '~/components/UserList.vue'
 import ChatList from '~/components/ChatList.vue'
 
+import firebase from 'firebase/app'
+import 'firebase/auth'
+
 export default {
+  async fetch ({ store }) {
+    firebase.auth().onAuthStateChanged(user => {
+      store.commit('SET_USER', user)
+    })
+  },
+
   components: {
     UserList,
     ChatList

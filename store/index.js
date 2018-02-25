@@ -1,19 +1,7 @@
 export const state = () => ({
-  users: [
-    {
-      userName: '@johnpapa',
-      imgUrl: 'https://avatars1.githubusercontent.com/u/1202528',
-      online: true
-    }, {
-      userName: '@vanessametonini',
-      imgUrl: 'https://avatars1.githubusercontent.com/u/3089882',
-      online: false
-    }, {
-      userName: '@Atinux',
-      imgUrl: 'https://avatars1.githubusercontent.com/u/904724',
-      online: false
-    }
-  ],
+  user: {},
+  profile: {},
+  users: [],
   search: ''
 })
 
@@ -25,6 +13,15 @@ export const getters = {
 }
 
 export const mutations = {
+  'SET_USER' (state, payload) {
+    state.user = payload || {}
+  },
+  'SET_USERS' (state, payload) {
+    state.users = payload || {}
+  },
+  'SET_PROFILE' (state, payload) {
+    state.profile = payload || {}
+  },
   'SET_SEARCH' (state, payload) {
     state.search = payload
   }
@@ -33,3 +30,5 @@ export const mutations = {
 export const actions = {
 
 }
+
+export const strict = false

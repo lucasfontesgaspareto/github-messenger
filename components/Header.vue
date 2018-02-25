@@ -1,10 +1,10 @@
 <template>
   <header class="header">
     <div class="section-user">
-      <div v-show="toggle" @click="toggle = !toggle" class="avatar-wrapper">
-        <img alt="@lucasfontesgaspareto" class="avatar float-left mr-1" src="https://avatars3.githubusercontent.com/u/8084651">
+      <div v-show="user.email" @click="logout" class="avatar-wrapper">
+        <img :alt="user.email" class="avatar float-left mr-1" :src="user.photoURL">
       </div>
-      <div v-show="!toggle" @click="toggle = !toggle"><a href="#">Log In</a></div>
+      <div v-show="!user.email" @click="login"><a href="#">Log In</a></div>
       <input v-model="search" class="input-search" type="text" placeholder="Search">
     </div>
   </header>
@@ -12,11 +12,12 @@
 
 <script>
 import { mapState, mapMutations } from 'vuex'
+import firebase from 'firebase/app'
+import 'firebase/auth'
 
 export default {
   data() {
     return {
-      toggle: true
     }
   },
   computed: {
@@ -27,10 +28,26 @@ export default {
       set: function(value) {
         return this.$store.commit('SET_SEARCH', value)
       }
-    }
+    },
+    ...mapState(['user'])
   },
   methods: {
+    login() {
+      firebase.auth().signInWithPopup(new firebase.auth.GithubAuthProvider()).then(result => {
+        const profile = result.additionalUserInfo.profile
+        profile.uid = result.user.uid
+
+        this.$store.commit('SET_USER', result.user)
+
+        this.$axios.defaults.headers.common['Authorization'] = `Bearer ${result.user.qa}`
+        this.$axios.post('https://us-central1-github-messenger.cloudfunctions.net/app/profile', profile)
+          .then(res => console.log(res))
+          .catch(error => console.log(error))
+        
+      }).catch(error => console.log(error))
+    },
     logout() {
+      firebase.auth().signOut()
     }
   }
 }
