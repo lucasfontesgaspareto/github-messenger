@@ -5,7 +5,7 @@
         <img :alt="user.email" class="avatar float-left mr-1" :src="user.photoURL">
       </div>
       <div v-show="!user.email" @click="login"><a href="#">Log In</a></div>
-      <input v-model="search" class="input-search" type="text" placeholder="Search">
+      <input v-model="search" class="input-search" type="text" placeholder="@username">
     </div>
   </header>
 </template>
@@ -34,16 +34,40 @@ export default {
   methods: {
     login() {
       firebase.auth().signInWithPopup(new firebase.auth.GithubAuthProvider()).then(result => {
-        const profile = result.additionalUserInfo.profile
+        let profile = result.additionalUserInfo.profile
         profile.uid = result.user.uid
 
-        this.$store.commit('SET_USER', result.user)
+        let maxPage = Math.ceil(profile.following / 30)
+        let url = profile.following_url.replace('{/other_user}','')
 
-        this.$axios.defaults.headers.common['Authorization'] = `Bearer ${result.user.qa}`
-        this.$axios.post('https://us-central1-github-messenger.cloudfunctions.net/app/profile', profile)
-          .then(res => console.log(res))
-          .catch(error => console.log(error))
-        
+        if (result.additionalUserInfo.isNewUser) {
+          const getFollowingUsers = (page) => {
+            this.$axios.get(`${url}?page=${page}`).then(res => {
+              if (profile.following_users) {
+                res.data.forEach(item => profile.following_users.push(item))
+              } else {
+                profile = { ...profile, following_users: res.data }
+              }
+              if (page < maxPage) {
+                getFollowingUsers((page + 1))
+              } else {
+                this.$store.commit('SET_USERS', profile.following_users)
+                this.$axios.defaults.headers.common['Authorization'] = `Bearer ${result.user.qa}`
+
+                // http://localhost:5000/github-messenger/us-central1/app
+                // https://us-central1-github-messenger.cloudfunctions.net/app/profile
+                this.$axios.post('http://localhost:5000/github-messenger/us-central1/app/profile', profile)
+                  .then(res => console.log(res))
+                  .catch(error => console.log(error))
+              }
+            }).catch(error => {
+              console.error(error.message)
+            })
+          }
+          getFollowingUsers(1)
+        }
+
+        this.$store.commit('SET_USER', result.user)
       }).catch(error => console.log(error))
     },
     logout() {

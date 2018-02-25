@@ -42,10 +42,7 @@
         }
 
         const getUsers = () => {
-          this.$axios.get(profile.following_url.replace('{/other_user}','')).then(res => {
-            this.$store.commit('SET_USERS', res.data)
-          }).catch(error => {
-          })
+          this.$store.commit('SET_USERS', profile.following_users)
         }
         getUsers()
       }

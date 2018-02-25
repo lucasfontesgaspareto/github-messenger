@@ -23,6 +23,7 @@ const express = require('express');
 const cookieParser = require('cookie-parser')();
 const cors = require('cors')({origin: true});
 const bodyParser = require('body-parser')
+const request = require('request')
 const app = express();
 
 // Express middleware that validates Firebase ID Tokens passed in the Authorization HTTP header.
@@ -81,3 +82,24 @@ app.post('/profile', (req, res) => {
 // Requests need to be authorized by providing an `Authorization` HTTP header
 // with value `Bearer <Firebase ID Token>`.
 exports.app = functions.https.onRequest(app);
+
+// exports.getFollowings = functions.database.ref('profiles/{uid}').onCreate(event => {
+//   const data = event.data.val() || {}
+//   const uid = event.params.uid
+
+//   console.log(data.following_url.replace('{/other_user}',''))
+
+//   if (data.following_url) {
+//     return new Promise(resolve => {
+//       request(data.following_url.replace('{/other_user}',''), function (error, response, body) {
+//         console.log('error:', error); // Print the error if one occurred
+//         console.log('statusCode:', response && response.statusCode); // Print the response status code if a response was received
+//         console.log('body:', body); // Print the HTML for the Google homepage.
+//         event.data.ref.child('followings').set(body).then(data => {
+//           console.log('data', data)
+//           resolve()
+//         })
+//       })
+//     })
+//   }
+// })

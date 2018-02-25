@@ -8,7 +8,7 @@ export const state = () => ({
 export const getters = {
   users(state) {
     return state.search ? state.users.filter(user =>
-      user.userName.toLowerCase().indexOf(state.search.toLowerCase()) != -1) : state.users
+      user.login.toLowerCase().indexOf(state.search.toLowerCase()) != -1) : state.users
   }
 }
 
