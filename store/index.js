@@ -2,7 +2,8 @@ export const state = () => ({
   user: {},
   profile: {},
   users: [],
-  search: ''
+  search: '',
+  chatToggle: false
 })
 
 export const getters = {
@@ -24,6 +25,9 @@ export const mutations = {
   },
   'SET_SEARCH' (state, payload) {
     state.search = payload
+  },
+  'SET_CHAT_TOGGLE' (state) {
+    this.state.chatToggle = !this.state.chatToggle
   }
 }
 

@@ -1,6 +1,6 @@
 <template>
-  <div class="user-list container column">
-    <div v-for="user in users" :key="user.login" :class="{ online: isOn(user.id) }" class="user">
+  <div class="user-list">
+    <div @click="chat(user)" v-for="user in users" :key="user.login" :class="{ online: isOn(user.id) }" class="user">
       <img :alt="user.login" class="avatar" :src="user.avatar_url">
     </div>
   </div>
@@ -15,7 +15,8 @@
   export default {
     data() {
       return {
-        online: {}
+        online: {},
+        chatToggle: false
       }
     },
 
@@ -27,6 +28,12 @@
         return function (id) {
           return this.online[id]
         }
+      }
+    },
+
+    methods: {
+      chat(user) {
+        this.$store.commit('SET_CHAT_TOGGLE')
       }
     },
 
