@@ -3,7 +3,10 @@ export const state = () => ({
   profile: {},
   users: [],
   search: '',
-  chatToggle: false
+  chatToggle: false,
+  chat: {},
+  online: {},
+  currentUserChat: {}
 })
 
 export const getters = {
@@ -28,6 +31,15 @@ export const mutations = {
   },
   'SET_CHAT_TOGGLE' (state) {
     this.state.chatToggle = !this.state.chatToggle
+  },
+  'SET_CHAT' (state, payload) {
+    this.state.chat = payload
+  },
+  'SET_ONLINE' (state, payload) {
+    state.online = payload
+  },
+  'SET_CURRENT_USER_CHAT' (state, payload) {
+    state.currentUserChat = payload
   }
 }
 

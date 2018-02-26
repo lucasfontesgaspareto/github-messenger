@@ -1,16 +1,16 @@
 <template>
   <div class="chat">
     <div class="chat-wrapper">
-      <div class="chat-user">{{user.login}}</div>
+      <div class="chat-user">{{chat.userTo}}</div>
       <div class="chat-messages">
-        <div class="chat-messages-wrapper" v-for="(msg, index) in messages" :key="index">
-          <div class="chat-message" :class="{ isUser: msg.isUser }">
+        <div class="chat-messages-wrapper" v-for="(msg, index) in chat.messages" :key="index">
+          <div class="chat-message" :class="{ isUser: msg.userTo != user.uid }">
             {{msg.text}}
           </div>
         </div>
       </div>
       <div class="chat-input">
-        <input type="text" placeholder="Your message here...!">
+        <input @keyup.13="send" v-model="text" type="text" placeholder="Your message here...!">
       </div>
       <div class="chat-fechar">
         <button @click="chatToggle">Fechar</button>
@@ -20,134 +20,36 @@
 </template>
 
 <script>
-import { mapMutations } from 'vuex'
+import { mapMutations, mapState } from 'vuex'
+import firebase from 'firebase/app'
+import 'firebase/database'
 
 export default {
   data() {
     return {
-      user: {
-        login: '@lucasfontesgaspareto'
-      },
-      messages: [
-        {
-          text: 'Oi tudo bem?',
-          author: 'lucasfontegaspareto',
-          isUser: true
-        },
-        {
-          text: 'Oi tudo é com você?',
-          author: 'gustavoquinalha'
-        },
-        {
-          text: 'Tudo bem também!',
-          author: 'lucasfontegaspareto',
-          isUser: true
-        },
-        {
-          text: 'Oi tudo bem?',
-          author: 'lucasfontegaspareto',
-          isUser: true
-        },
-        {
-          text: 'Oi tudo é com você?',
-          author: 'gustavoquinalha'
-        },
-        {
-          text: 'Tudo bem também!',
-          author: 'lucasfontegaspareto',
-          isUser: true
-        },
-        {
-          text: 'Oi tudo bem?',
-          author: 'lucasfontegaspareto',
-          isUser: true
-        },
-        {
-          text: 'Oi tudo é com você?',
-          author: 'gustavoquinalha'
-        },
-        {
-          text: 'Tudo bem também!',
-          author: 'lucasfontegaspareto',
-          isUser: true
-        },{
-          text: 'Oi tudo bem?',
-          author: 'lucasfontegaspareto',
-          isUser: true
-        },
-        {
-          text: 'Oi tudo é com você?',
-          author: 'gustavoquinalha'
-        },
-        {
-          text: 'Tudo bem também!',
-          author: 'lucasfontegaspareto',
-          isUser: true
-        },
-        {
-          text: 'Oi tudo bem?',
-          author: 'lucasfontegaspareto',
-          isUser: true
-        },
-        {
-          text: 'Oi tudo é com você?',
-          author: 'gustavoquinalha'
-        },
-        {
-          text: 'Tudo bem também!',
-          author: 'lucasfontegaspareto',
-          isUser: true
-        },
-        {
-          text: 'Oi tudo bem?',
-          author: 'lucasfontegaspareto',
-          isUser: true
-        },
-        {
-          text: 'Oi tudo é com você?',
-          author: 'gustavoquinalha'
-        },
-        {
-          text: 'Tudo bem também!',
-          author: 'lucasfontegaspareto',
-          isUser: true
-        },
-        {
-          text: 'Oi tudo bem?',
-          author: 'lucasfontegaspareto',
-          isUser: true
-        },
-        {
-          text: 'Oi tudo é com você?',
-          author: 'gustavoquinalha'
-        },
-        {
-          text: 'Tudo bem também!',
-          author: 'lucasfontegaspareto',
-          isUser: true
-        },
-        {
-          text: 'Oi tudo bem?',
-          author: 'lucasfontegaspareto',
-          isUser: true
-        },
-        {
-          text: 'Oi tudo é com você?',
-          author: 'gustavoquinalha'
-        },
-        {
-          text: 'Tudo bem também!',
-          author: 'lucasfontegaspareto',
-          isUser: true
-        }
-      ]
+      text: ''
     }
+  },
+
+  computed: {
+    ...mapState(['chat', 'currentUserChat', 'online', 'profile', 'user'])
   },
 
   methods: {
     ...mapMutations({
       chatToggle: 'SET_CHAT_TOGGLE'
-    })
+    }),
+    send() {
+      if (this.currentUserChat) {
+        firebase.database().ref(`chats/${this.profile.chats[this.currentUserChat].chatId}/messages/`).push().set({
+          userFrom: this.user.uid,
+          userTo: this.currentUserChat,
+          text: this.text
+        }).then(data => {
+          this.text = ''
+        })
+      }
+    }
   }
 }
 </script>
@@ -177,6 +79,11 @@ export default {
     max-width: 600px;
     border-radius: 4px;
   }
+  @media (min-width: 600px) {
+    .chat-wrapper {
+      margin: 40px auto;
+    }
+  }
   .chat-user {
     border-radius: 4px 4px 0px 0px;
     color: #fff;
@@ -189,9 +96,10 @@ export default {
     padding: 8px;
     min-height: 100px;
     max-height: 60vh;
-    overflow: scroll;
+    overflow-y: scroll;
     font-size: .9rem;
     background-color: rgba(255, 255, 255, .125);
+    margin: 0 8px;
   }
   .chat-messages .chat-messages-wrapper {
     clear: both;
@@ -203,10 +111,10 @@ export default {
     width: auto;
     display: inline-block;
     border-radius: 3px;
-    float: left;
+    float: right;
   }
   .chat-messages .chat-message.isUser {
-    float: right;
+    float: left;
   }
   .chat-input {
     background: #24292e;
@@ -226,5 +134,19 @@ export default {
     font-weight: normal;
     outline: none;
     vertical-align: middle;
+  }
+  .chat-fechar {
+    line-height: 100%;
+  }
+  .chat-fechar button {
+    background: #cb2431;
+    border: 0;
+    border-radius: 0px 0px 4px 4px;
+    margin: 0px;
+    padding: 0px;
+    height: 30px;
+    width: 100%;
+    color: white;
+    font-weight: bold;
   }
 </style>

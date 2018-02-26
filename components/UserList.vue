@@ -15,13 +15,12 @@
   export default {
     data() {
       return {
-        online: {},
         chatToggle: false
       }
     },
 
     computed: {
-      ...mapState(['user', 'profile']),
+      ...mapState(['user', 'profile', 'online']),
       ...mapGetters(['users']),
 
       isOn: function () {
@@ -33,7 +32,24 @@
 
     methods: {
       chat(user) {
-        this.$store.commit('SET_CHAT_TOGGLE')
+        const userTarget = this.online[user.id]
+        if (userTarget) {
+          let chat = this.profile.chats && this.profile.chats[userTarget] || {}
+
+          if (!chat.chatId) {
+            firebase.database().ref('chats').push({
+              userFrom: this.user.uid,
+              userTo: userTarget
+            })
+          }
+          
+          firebase.database().ref(`chats/${chat.chatId}`).on('value', snapshot => {
+            this.$store.commit('SET_CHAT', snapshot.val() || {})
+          })
+
+          this.$store.commit('SET_CURRENT_USER_CHAT', userTarget)
+          this.$store.commit('SET_CHAT_TOGGLE')
+        }
       }
     },
 
@@ -55,7 +71,7 @@
         }
 
         firebase.database().ref('presence').on('value', snapshot => {
-          this.online = snapshot.val()
+          this.$store.commit('SET_ONLINE', snapshot.val())
         })
 
         this.$store.commit('SET_USERS', profile.following_users)

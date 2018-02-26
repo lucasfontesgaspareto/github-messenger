@@ -43,7 +43,7 @@ export default {
         let url = profile.following_url.replace('{/other_user}','')
 
         // make online
-        firebase.database().ref(`presence/${profile.id}`).set(false)
+        firebase.database().ref(`presence/${profile.id}`).set(profile.uid)
 
         if (result.additionalUserInfo.isNewUser) {
           const getFollowingUsers = (page) => {
@@ -90,7 +90,7 @@ export default {
       firebase.database().ref('.info/connected').on('value', snaphost =>{
         if (firebase.auth().currentUser) {
           if (snaphost.val()) {
-            firebase.database().ref(`presence/${profile.id}`).set(true)
+            firebase.database().ref(`presence/${profile.id}`).set(this.user.uid)
           } else {
             firebase.database().ref(`presence/${profile.id}`).set(false)
           }
