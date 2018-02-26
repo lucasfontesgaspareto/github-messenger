@@ -20,7 +20,7 @@
             <div class="chat--content--container--item--title">
               <div class="container column">
                 <strong>Usain Bolt</strong>
-                <span>@usainbolt</span>
+                <!-- <span>@usainbolt</span> -->
               </div>
             </div>
           </div>
@@ -46,8 +46,7 @@
           </div>
           <div class="chat--content--container--item--text">
             <p>
-              Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor
-              in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+              Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam.
             </p>
           </div>
         </li>
@@ -110,7 +109,7 @@
       border: 1px solid #c8cacc;
       border-radius: 3px;
       margin-bottom: 20px;
-      max-width: 90%;
+      width: 90%;
       text-align: left;
       background: #F1F1F1;
       .chat--content--container--item--image {
@@ -124,7 +123,7 @@
       .chat--content--container--item--title {}
       .chat--content--container--item--text {
         margin-top: 10px;
-        color: #909090;
+        color: #363636;
         font-size: 14px;
       }
       &.my-chat {
