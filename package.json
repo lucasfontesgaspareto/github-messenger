@@ -16,6 +16,9 @@
   },
   "devDependencies": {
     "cross-env": "^5.0.1",
-    "firebase": "^4.10.1"
+    "firebase": "^4.10.1",
+    "node-sass": "^4.7.2",
+    "sass-loader": "^6.0.6",
+    "the-grid-flexbox": "^2.0.1"
   }
 }
