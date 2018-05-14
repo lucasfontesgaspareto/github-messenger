@@ -77,7 +77,7 @@
           }, 400)
         }
 
-        this.viewChat()
+        // this.viewChat()
       },
       keyPress(event) {
         if (event.keyCode === 13) {

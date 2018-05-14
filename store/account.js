@@ -46,10 +46,11 @@ export const actions = {
     })
   },
   logout({ commit, dispatch }) {
-    dispatch('setOnline', false)
-    setTimeout(() => {
-      firebase.auth().signOut().then(console.log)
-    }, 400)
+    dispatch('setOnline', false).then(() => {
+      setTimeout(() => {
+        firebase.auth().signOut().then(console.log)
+      }, 400)
+    })
   },
   fetchUsers({ state, commit }, profile) {
     return new Promise((resolve, reject) => {
@@ -73,7 +74,7 @@ export const actions = {
     })
   },
   setOnline({ state }, online) {
-    firebase.database().ref(`account/${state.user.uid}/online`).set(online)
+    return firebase.database().ref(`account/${state.user.uid}/online`).set(online)
   },
   watchUser({ state, commit }, user) {
     firebase.database().ref(`pairID/${user.id}`).once('value', snapshot => {
@@ -84,6 +85,11 @@ export const actions = {
       })
       firebase.database().ref(`account/${uid}/chats/${state.user.uid}/unview`).on('value', snapshot => {
         user.unview = snapshot.val()
+
+        commit('updateUser', user)
+      })
+      firebase.database().ref(`account/${uid}/chats/${state.user.uid}/lastUnviewMsg`).on('value', snapshot => {
+        user.lastUnviewMsg = snapshot.val()
 
         commit('updateUser', user)
       })

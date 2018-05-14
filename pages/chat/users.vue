@@ -24,8 +24,8 @@
             <div class="users--list ">
 
               <ul class="users--list--conversation">
-                <li class="list-title">Online <strong>({{usersUnview.length}})</strong> </li>
-                <li v-for="user in usersUnview" class="conversation" @click="openChat(user)">
+                <li class="list-title">not viewed<strong>({{usersUnview.length}})</strong> </li>
+                <li v-for="user in usersUnview" class="conversation" @click="open(user)">
                   <div class="user container align-items-start">
 
                     <div class="user--image">
@@ -39,7 +39,7 @@
                         <span>{{user.login}}</span>
                       </div>
                       <div class="">
-                        <p>Lorem ipsum dolor sit amet gaspa viado...</p>
+                        <p>{{user.lastUnviewMsg}}</p>
                       </div>
                     </div>
                   </div>
@@ -48,7 +48,7 @@
 
               <ul>
                 <li class="list-title">Online <strong>({{usersOnline.length}})</strong> </li>
-                <li v-for="user in usersOnline" @click="openChat(user)">
+                <li v-for="user in usersOnline" @click="open(user)">
                   <div class="user container align-items-start">
                     <div class="user--image">
                       <img :src="user.avatar_url" width="100%" alt="">
@@ -67,7 +67,7 @@
 
               <ul>
                 <li class="list-title">All <strong>({{usersOffline.length}})</strong> </li>
-                <li v-for="user in usersOffline" @click="openChat(user)">
+                <li v-for="user in usersOffline" @click="open(user)">
                   <div class="user container align-items-start">
                     <div class="user--image">
                       <img :src="user.avatar_url" width="100%" alt="">
@@ -134,13 +134,26 @@
     },
     methods: {
       ...mapActions('account', ['watchUser']),
-      ...mapActions('chat', ['openChat']),
+      ...mapActions('chat', ['openChat', 'viewChat']),
       fetchUserInfo(users) {
         users.forEach(async user => {
           if (!user.watching) {
             this.watchUser(user)
           }
         })
+      },
+      scrollToBot() {
+        const el = document.querySelector('.chat--content')
+        if (el && el.scrollTop >= 0) {
+          setTimeout(() => {
+            el.scrollTop = 99999
+            this.viewChat()
+          }, 400)
+        }
+      },
+      open(user) {
+        this.openChat(user)
+        this.scrollToBot()
       }
     }
   }

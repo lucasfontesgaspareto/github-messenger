@@ -18,6 +18,12 @@
     data() {
       return {
       }
+    },
+    created() {
+      window.onbeforeunload = () => {
+        this.$store.dispatch('account/setOnline', false)
+        return true
+      }
     }
   }
 </script>

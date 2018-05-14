@@ -30,21 +30,30 @@ export const actions = {
     })
   },
   send({ commit, rootState, state }, text) {
-    firebase.database().ref(`account/${state.chat.uidFrom}/chats/${state.chat.uidTo}/unview`).set(true)
-    firebase.database().ref(`account/${state.chat.uidFrom}/chats/${state.chat.uidTo}/messages`).push({
-      text,
-      uid: rootState.account.user.uid,
-      timestamp: _.now()
-    })
-    firebase.database().ref(`account/${state.chat.uidTo}/chats/${state.chat.uidFrom}/unview`).set(true)
-    firebase.database().ref(`account/${state.chat.uidTo}/chats/${state.chat.uidFrom}/messages`).push({
-      text,
-      uid: state.chat.uidFrom,
-      timestamp: _.now()
-    })
+    if (state.chat.uidFrom && state.chat.uidTo) {
+      firebase.database().ref(`account/${state.chat.uidFrom}/chats/${state.chat.uidTo}/unview`).set(true)
+      firebase.database().ref(`account/${state.chat.uidFrom}/chats/${state.chat.uidTo}/lastUnviewMsg`).set(text)
+      firebase.database().ref(`account/${state.chat.uidFrom}/chats/${state.chat.uidTo}/messages`).push({
+        text,
+        uid: rootState.account.user.uid,
+        timestamp: _.now()
+      })
+      // firebase.database().ref(`account/${state.chat.uidTo}/chats/${state.chat.uidFrom}/unview`).set(true)
+      // firebase.database().ref(`account/${state.chat.uidTo}/chats/${state.chat.uidFrom}/lastUnviewMsg`).set(text)
+      firebase.database().ref(`account/${state.chat.uidTo}/chats/${state.chat.uidFrom}/messages`).push({
+        text,
+        uid: state.chat.uidFrom,
+        timestamp: _.now()
+      })
+    }
   },
   viewChat({ state, commit }) {
-    firebase.database().ref(`account/${state.chat.uidTo}/chats/${state.chat.uidFrom}/unview`).set(false)
+    if (state.chat.uidTo && state.chat.uidFrom) {
+      firebase.database().ref(`account/${state.chat.uidTo}/chats/${state.chat.uidFrom}/unview`).set(false)
+      firebase.database().ref(`account/${state.chat.uidTo}/chats/${state.chat.uidFrom}/lastUnviewMsg`).set(false)
+      // firebase.database().ref(`account/${state.chat.uidFrom}/chats/${state.chat.uidTo}/unview`).set(false)
+      // firebase.database().ref(`account/${state.chat.uidFrom}/chats/${state.chat.uidTo}/lastUnviewMsg`).set(false)
+    }
   }
 }
 
