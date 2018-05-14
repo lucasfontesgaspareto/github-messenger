@@ -11,7 +11,7 @@
           <div class="users">
             <div class="users--search container">
               <div class="flex-grow-1 margin-right-10">
-                <input type="text" class="form-control" placeholder="Search...">
+                <input v-model="search" type="text" class="form-control" placeholder="Search...">
               </div>
               <button type="button" name="button" class="btn">+</button>
             </div>
@@ -24,19 +24,19 @@
             <div class="users--list ">
 
               <ul class="users--list--conversation">
-                <li class="list-title">Online <strong>(3)</strong> </li>
-                <li v-for="x in 3" class="conversation">
+                <li class="list-title">Online <strong>({{usersUnview.length}})</strong> </li>
+                <li v-for="user in usersUnview" class="conversation" @click="openChat(user)">
                   <div class="user container align-items-start">
 
                     <div class="user--image">
-                      <img src="https://avatars0.githubusercontent.com/u/8084651?s=64&v=4" width="100%" alt="">
+                      <img :src="user.avatar_url" width="100%" alt="">
                     </div>
                     <div class="user--info container column">
                       <div class="">
-                        <strong>Usaim Bolt</strong>
+                        <strong>{{user.login}}</strong>
                       </div>
                       <div class="">
-                        <span>@usaimbolt</span>
+                        <span>{{user.login}}</span>
                       </div>
                       <div class="">
                         <p>Lorem ipsum dolor sit amet gaspa viado...</p>
@@ -47,18 +47,18 @@
               </ul>
 
               <ul>
-                <li class="list-title">Online <strong>(3)</strong> </li>
-                <li v-for="x in 3">
+                <li class="list-title">Online <strong>({{usersOnline.length}})</strong> </li>
+                <li v-for="user in usersOnline" @click="openChat(user)">
                   <div class="user container align-items-start">
                     <div class="user--image">
-                      <img src="https://avatars0.githubusercontent.com/u/8084651?s=64&v=4" width="100%" alt="">
+                      <img :src="user.avatar_url" width="100%" alt="">
                     </div>
                     <div class="user--info container column">
                       <div class="">
-                        <strong>Usaim Bolt</strong>
+                        <strong>{{user.login}}</strong>
                       </div>
                       <div class="">
-                        <span>@usaimbolt</span>
+                        <span>@{{user.login}}</span>
                       </div>
                     </div>
                   </div>
@@ -66,18 +66,18 @@
               </ul>
 
               <ul>
-                <li class="list-title">All <strong>(6)</strong> </li>
-                <li v-for="x in 6">
+                <li class="list-title">All <strong>({{usersOffline.length}})</strong> </li>
+                <li v-for="user in usersOffline" @click="openChat(user)">
                   <div class="user container align-items-start">
                     <div class="user--image">
-                      <img src="https://avatars0.githubusercontent.com/u/8084651?s=64&v=4" width="100%" alt="">
+                      <img :src="user.avatar_url" width="100%" alt="">
                     </div>
                     <div class="user--info container column">
                       <div class="">
-                        <strong>Usaim Bolt</strong>
+                        <strong>{{user.login}}</strong>
                       </div>
                       <div class="">
-                        <span>@usaimbolt</span>
+                        <span>@{{user.login}}</span>
                       </div>
                     </div>
                   </div>
@@ -93,10 +93,53 @@
 </template>
 
 <script>
+  import { mapState, mapGetters, mapActions } from 'vuex'
+
   export default {
     data() {
       return {
         showChat: true,
+        search: ''
+      }
+    },
+    computed: {
+      users: {
+        get() {
+          let users = this.$store.state.account.users
+          if (this.search) {
+            users = this.$store.state.account.users.filter(user => user.login.indexOf(this.search) != -1)
+          }
+          return users
+        }
+      },
+      usersOnline: {
+        get() {
+          return this.users.filter(user => user.online)
+        }
+      },
+      usersOffline: {
+        get() {
+          return this.users.filter(user => !user.online)
+        }
+      },
+      usersUnview: {
+        get() {
+          return this.users.filter(user => user.unview)
+        }
+      }
+    },
+    watch: {
+      users: 'fetchUserInfo'
+    },
+    methods: {
+      ...mapActions('account', ['watchUser']),
+      ...mapActions('chat', ['openChat']),
+      fetchUserInfo(users) {
+        users.forEach(async user => {
+          if (!user.watching) {
+            this.watchUser(user)
+          }
+        })
       }
     }
   }

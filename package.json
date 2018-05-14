@@ -12,6 +12,7 @@
   },
   "dependencies": {
     "@nuxtjs/axios": "^5.0.1",
+    "lodash": "^4.17.10",
     "nuxt": "^1.0.0"
   },
   "devDependencies": {

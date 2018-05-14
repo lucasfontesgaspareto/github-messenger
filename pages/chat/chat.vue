@@ -1,8 +1,8 @@
 <template lang="html">
-  <div class="chat">
+  <div class="chat" v-if="chat">
     <div class="chat--head container align-items-center justify-content-between">
       <div class="">
-        to: <strong>Usain Bolt</strong>
+        to: <strong>{{chat.login}}</strong>
       </div>
       <div class="">
         <strong><a href="#">Github profile</a></strong>
@@ -12,41 +12,28 @@
     <div class="chat--content">
       <ul class="chat--content--container">
 
-        <li class="chat--content--container--item " v-for="x in 2">
+        <li class="chat--content--container--item"
+          v-for="message in chat.messages"
+          :class="{ 'my-chat': message.uid === user.uid }"
+        >
           <div class="container align-items-center">
             <div class="chat--content--container--item--image">
-              <img src="https://avatars0.githubusercontent.com/u/8084651?s=64&v=4" width="100%" alt="">
+              <img
+                v-if="message.uid === user.uid"
+                :src="chat.photoURLFrom" width="100%" alt="">
+              <img
+                v-if="message.uid !== user.uid"
+                :src="chat.photoURLTo" width="100%" alt="">
             </div>
             <div class="chat--content--container--item--title">
               <div class="container column">
-                <strong>Usain Bolt</strong>
-                <!-- <span>@usainbolt</span> -->
+                <strong>{{chat.login}}</strong>
               </div>
             </div>
           </div>
           <div class="chat--content--container--item--text">
             <p>
-              Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor
-              in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
-            </p>
-          </div>
-        </li>
-
-        <li class="chat--content--container--item my-chat" v-for="x in 2">
-          <div class="chat--content--container--item--head container align-items-center">
-            <div class="chat--content--container--item--image">
-              <img src="https://avatars0.githubusercontent.com/u/8084651?s=64&v=4" width="100%" alt="">
-            </div>
-            <div class="chat--content--container--item--title">
-              <div class="container column">
-                <strong>Usain Bolt</strong>
-                <span>@usainbolt</span>
-              </div>
-            </div>
-          </div>
-          <div class="chat--content--container--item--text">
-            <p>
-              Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam.
+              {{message.text}}
             </p>
           </div>
         </li>
@@ -57,15 +44,30 @@
 
     <div class="chat--message container align-items-start justify-content-between">
       <div class="flex-grow-1 margin-right-10">
-        <textarea class="form-control" name="name" rows="2" placeholder="Type a text..."></textarea>
+        <textarea v-model="text" class="form-control" name="name" rows="2" placeholder="Type a text..."></textarea>
       </div>
-      <button type="button" name="button" class="btn">Send</button>
+      <button @click="send(text); text = ''" type="button" name="button" class="btn">Send</button>
     </div>
   </div>
 </template>
 
 <script>
-  export default {}
+  import { mapState, mapActions } from 'vuex'
+
+  export default {
+    data() {
+      return {
+        text: ''
+      }
+    },
+    computed: {
+      ...mapState('account', ['user']),
+      ...mapState('chat', ['chat'])
+    },
+    methods: {
+      ...mapActions('chat', ['send'])
+    }
+  }
 </script>
 
 <style lang="scss" scoped>

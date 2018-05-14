@@ -81,7 +81,7 @@ app.post('/profile', (req, res) => {
 // This HTTPS endpoint can only be accessed by your Firebase Users.
 // Requests need to be authorized by providing an `Authorization` HTTP header
 // with value `Bearer <Firebase ID Token>`.
-exports.app = functions.https.onRequest(app);
+// exports.app = functions.https.onRequest(app);
 
 exports.onCreateChat = functions.database.ref('chats/{key}').onCreate(event => {
   const data = event.data.val()

@@ -1,107 +1,36 @@
 <template>
   <header class="header">
-    <div class="section-user">
-      <div v-show="user.email" @click="logout" class="avatar-wrapper">
+    <div class="section-user" v-if="user">
+      <div @click="logout" class="avatar-wrapper">
         <img :alt="user.email" class="avatar float-left mr-1" :src="user.photoURL">
       </div>
-      <div v-show="!user.email" @click="login"><a href="#">Log In</a></div>
-      <input v-model="search" class="input-search" type="text" placeholder="@username">
     </div>
+    <div v-if="!isOn" @click="login"><a href="#">Log In</a></div>
   </header>
 </template>
 
 <script>
-import { mapState, mapMutations } from 'vuex'
-import firebase from 'firebase/app'
-import 'firebase/auth'
+import { mapState, mapActions, mapMutations, mapGetters } from 'vuex'
 
 export default {
   data() {
     return {
+      search: ''
     }
   },
 
   computed: {
-    search: {
-      get: function() {
-        return this.$store.state.search
-      },
-      set: function(value) {
-        return this.$store.commit('SET_SEARCH', value)
-      }
-    },
-    ...mapState(['user', 'profile'])
+    ...mapState('account', { isOn: 'online', user: 'user' })
   },
 
   methods: {
-    login() {
-      firebase.auth().signInWithPopup(new firebase.auth.GithubAuthProvider()).then(result => {
-        let profile = result.additionalUserInfo.profile
-        profile.uid = result.user.uid
-
-        let maxPage = Math.ceil(profile.following / 30)
-        let url = profile.following_url.replace('{/other_user}','')
-
-        // make online
-        firebase.database().ref(`presence/${profile.id}`).set(profile.uid)
-
-        if (result.additionalUserInfo.isNewUser) {
-          const getFollowingUsers = (page) => {
-            this.$axios.get(`${url}?page=${page}`).then(res => {
-              if (profile.following_users) {
-                res.data.forEach(item => profile.following_users.push(item))
-              } else {
-                profile = { ...profile, following_users: res.data }
-              }
-              if (page < maxPage) {
-                getFollowingUsers((page + 1))
-              } else {
-                
-                this.$store.commit('SET_USERS', profile.following_users)
-                this.$axios.defaults.headers.common['Authorization'] = `Bearer ${result.user.qa}`
-
-                // http://localhost:5000/github-messenger/us-central1/app
-                // https://us-central1-github-messenger.cloudfunctions.net/app/profile
-                this.$axios.post('http://localhost:5000/github-messenger/us-central1/app/profile', profile)
-                  .then(res => console.log('profile', res))
-                  .catch(error => console.log(error))
-              }
-            }).catch(error => {
-              console.error(error.message)
-            })
-          }
-          getFollowingUsers(1)
-        }
-
-        this.$store.commit('SET_USER', result.user)
-      }).catch(error => console.log(error))
-    },
-    logout() {
-      firebase.database().ref(`presence/${this.profile.id}`).set(false).then(res => {
-        firebase.auth().signOut()
-      })
-    }
-  },
-
-  watch: {
-    profile: function (profile) {
-      window.id = profile.id
-
-      firebase.database().ref('.info/connected').on('value', snaphost =>{
-        if (firebase.auth().currentUser) {
-          if (snaphost.val()) {
-            firebase.database().ref(`presence/${profile.id}`).set(this.user.uid)
-          } else {
-            firebase.database().ref(`presence/${profile.id}`).set(false)
-          }
-        }
-      })
-    }
+    ...mapActions('account', ['login', 'logout', 'setOnline'])
   },
 
   beforeMount() {
     window.onbeforeunload = function() {
-      firebase.database().ref(`presence/${window.id}`).set(false)
+      this.setOnline(false)
+      return true
     }
   }
 }
