@@ -47,7 +47,7 @@
 
     <div class="chat--message container align-items-start justify-content-between">
       <div class="flex-grow-1 margin-right-10">
-        <textarea @keypress="keyPress" @keyup.ENTER="send(text); text = ''" v-model="text" class="form-control" name="name" rows="2" placeholder="Type a text..."></textarea>
+        <textarea @keyup="keyPress" @keyup.ENTER="send(text); text = ''" v-model="text" class="form-control" name="name" rows="2" placeholder="Type a text..."></textarea>
       </div>
       <button @click="send(text); text = ''" type="button" name="button" class="btn">Send</button>
     </div>
