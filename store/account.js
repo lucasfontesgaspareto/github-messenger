@@ -47,7 +47,9 @@ export const actions = {
   },
   logout({ commit, dispatch }) {
     dispatch('setOnline', false)
-    firebase.auth().signOut().then(console.log)
+    setTimeout(() => {
+      firebase.auth().signOut().then(console.log)
+    }, 400)
   },
   fetchUsers({ state, commit }, profile) {
     return new Promise((resolve, reject) => {
@@ -80,8 +82,9 @@ export const actions = {
         user.online = snapshot.val()
         commit('updateUser', user)
       })
-      firebase.database().ref(`account/${state.user.uid}/unview/${uid}`).on('value', snapshot => {
+      firebase.database().ref(`account/${uid}/chats/${state.user.uid}/unview`).on('value', snapshot => {
         user.unview = snapshot.val()
+
         commit('updateUser', user)
       })
       user.watching = true

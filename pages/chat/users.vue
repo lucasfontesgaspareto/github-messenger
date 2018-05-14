@@ -103,6 +103,7 @@
       }
     },
     computed: {
+      ...mapState('account', ['user']),
       users: {
         get() {
           let users = this.$store.state.account.users

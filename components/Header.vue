@@ -5,7 +5,7 @@
         <img :alt="user.email" class="avatar float-left mr-1" :src="user.photoURL">
       </div>
     </div>
-    <div v-if="!isOn" @click="login"><a href="#">Log In</a></div>
+    <div v-else @click="login"><a href="#">Log In</a></div>
   </header>
 </template>
 

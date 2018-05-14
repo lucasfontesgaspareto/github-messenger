@@ -13,10 +13,13 @@
       <ul class="chat--content--container">
 
         <li class="chat--content--container--item"
-          v-for="message in chat.messages"
+          v-for="(message, key) in chat.messages"
+          :key="key"
           :class="{ 'my-chat': message.uid === user.uid }"
         >
-          <div class="container align-items-center">
+          <div class="container align-items-center"
+            :class="{ 'chat--content--container--item--head': message.uid === user.uid }"
+          >
             <div class="chat--content--container--item--image">
               <img
                 v-if="message.uid === user.uid"
@@ -35,9 +38,9 @@
             <p>
               {{message.text}}
             </p>
+            <small>{{message.timestamp}}</small>
           </div>
         </li>
-
       </ul>
     </div>
 
@@ -65,7 +68,20 @@
       ...mapState('chat', ['chat'])
     },
     methods: {
-      ...mapActions('chat', ['send'])
+      ...mapActions('chat', ['send', 'viewChat']),
+      scrollToBot() {
+        const el = document.querySelector('.chat--content')
+        if (el && el.scrollTop >= 0) {
+          setTimeout(() => {
+            el.scrollTop = 99999
+          }, 400)
+        }
+
+        this.viewChat()
+      }
+    },
+    watch: {
+      chat: 'scrollToBot'
     }
   }
 </script>
@@ -114,6 +130,7 @@
       width: 90%;
       text-align: left;
       background: #F1F1F1;
+      clear: right;
       .chat--content--container--item--image {
         width: 43px;
         height: 42px;

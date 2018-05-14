@@ -19,7 +19,6 @@ export const actions = {
       
       ref.child('uidTo').set(uid)
       ref.child('uidFrom').set(rootState.account.user.uid)
-      ref.child('timestamp').set(_.now())
 
       ref.on('value', snapshot => {
         const chat = snapshot.val()
@@ -31,10 +30,21 @@ export const actions = {
     })
   },
   send({ commit, rootState, state }, text) {
-    const ref = firebase.database().ref(`account/${state.chat.uidFrom}/chats/${state.chat.uidTo}/messages`).push({
+    firebase.database().ref(`account/${state.chat.uidFrom}/chats/${state.chat.uidTo}/unview`).set(true)
+    firebase.database().ref(`account/${state.chat.uidFrom}/chats/${state.chat.uidTo}/messages`).push({
       text,
-      uid: rootState.account.user.uid
+      uid: rootState.account.user.uid,
+      timestamp: _.now()
     })
+    firebase.database().ref(`account/${state.chat.uidTo}/chats/${state.chat.uidFrom}/unview`).set(true)
+    firebase.database().ref(`account/${state.chat.uidTo}/chats/${state.chat.uidFrom}/messages`).push({
+      text,
+      uid: state.chat.uidFrom,
+      timestamp: _.now()
+    })
+  },
+  viewChat({ state, commit }) {
+    firebase.database().ref(`account/${state.chat.uidTo}/chats/${state.chat.uidFrom}/unview`).set(false)
   }
 }
 
